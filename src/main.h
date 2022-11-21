@@ -2,6 +2,16 @@
 
 void getEvents(window::XWindow window);
 
+class GridSquare{
+  public:
+    GridSquare(int x_loc, int y_loc);
+
+  private:
+    int x_loc;
+    int y_loc;
+    bool visited_;
+};
+
 class StaticGrid{
   public:
     StaticGrid(window::XWindow window);
@@ -12,6 +22,7 @@ class StaticGrid{
 
   private:
     window::XWindow window_;
+    std::vector<GridSquare> squares_;
 };
 
 // Check equality accounting for floating point error

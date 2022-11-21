@@ -46,8 +46,8 @@ void StaticGrid::drawGrid(int w_cells, int h_cells){
   int cell_width = 40;
 
   window_.redraw();
-  bool should_fill = false;
   for (int i = 0; i < w_cells; i++){
+    bool should_fill = i % 2 == 0;
     for (int j = 0; j < h_cells; j++){
       should_fill = !should_fill;
       drawSquare(x_start + j * cell_height, y_start + i * cell_width, cell_height, cell_width, should_fill);
@@ -63,10 +63,6 @@ void StaticGrid::drawSquare(int x, int y, int w, int h, bool full){
   }else{
     XDrawRectangle(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, w, h);
   }
-  /*XDrawLine(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, x + w, y);
-  XDrawLine(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, x, y - h);
-  XDrawLine(window_.getDisplay(), window_.getWindow(), window_.getGc(), x + w, y, x + w, y - h);
-  XDrawLine(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y - h, x + w, y - h);*/
 }
 
 template <class T>
@@ -95,7 +91,7 @@ int main(int argc, char** argv){
       break;
   }
 
-  grid.drawGrid(10, 10);
+  grid.drawGrid(8, 8);
 
   while(1) {
     //TODO: I think this needs to be in a separate thread.
