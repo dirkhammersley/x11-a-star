@@ -3,7 +3,6 @@ project(AStar)
 
 add_library(Window x_window.cpp x_window.h)
 add_executable(AStar main.cpp main.h)
-include_directories("/usr/include/eigen3")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
