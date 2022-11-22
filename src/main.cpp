@@ -57,11 +57,13 @@ void StaticGrid::drawGrid(int w_cells, int h_cells){
 }
 
 void StaticGrid::drawSquare(int x, int y, int w, int h, bool full){
-
+  
   if (full == true){
+    XSetForeground(window_.getDisplay(), window_.getGc(), window_.colors.cyber_red);
     XFillRectangle(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, w, h);
   }else{
-    XDrawRectangle(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, w, h);
+    XSetForeground(window_.getDisplay(), window_.getGc(), window_.colors.cyber_blue);
+    XFillRectangle(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, w, h);
   }
 }
 

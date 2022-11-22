@@ -36,12 +36,23 @@ class XWindow {
     void redraw();
 
     void close();
+    
+    // Colors can be defined with B + (G<<8) + (R<<16)
+    struct window_colors {
+      ulong cyber_red = 127 + (0<<8) + (255<<16);
+      ulong cyber_blue = 255 + (0<<8) + (127<<16);
+      ulong cyber_green = 200 + (255<<8) + (0<<16);
+    };
+
+    window_colors colors;
 
   private:
     Display *dis_;
 		int screen_;
 		Window win_;
 		GC gc_;
+
+    
 
     std::vector<XEvent> event_buffer_;
 	  KeySym key_;
