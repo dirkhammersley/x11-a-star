@@ -23,7 +23,7 @@ void getEvents(window::XWindow window){
     }
 
     if (text[0] == 'a'){
-      
+
     }
 
     std::cout << "Keypress: " << text[0] << "\n";
@@ -50,20 +50,33 @@ void StaticGrid::drawGrid(int w_cells, int h_cells){
     bool should_fill = i % 2 == 0;
     for (int j = 0; j < h_cells; j++){
       should_fill = !should_fill;
-      drawSquare(x_start + j * cell_height, y_start + i * cell_width, cell_height, cell_width, should_fill);
+      GridSquare square(x_start + j * cell_height, y_start + i * cell_width, cell_height, cell_width);
+      addSquareToGrid(square);
+      drawSquare(square, should_fill);
     }
   }
   XFlush(window_.getDisplay());
 }
 
-void StaticGrid::drawSquare(int x, int y, int w, int h, bool full){
-  
-  if (full == true){
-    XSetForeground(window_.getDisplay(), window_.getGc(), window_.colors.cyber_red);
-    XFillRectangle(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, w, h);
-  }else{
-    XSetForeground(window_.getDisplay(), window_.getGc(), window_.colors.cyber_blue);
-    XFillRectangle(window_.getDisplay(), window_.getWindow(), window_.getGc(), x, y, w, h);
+void StaticGrid::drawSquare(GridSquare square, bool full){
+  square.draw(window_, full);
+}
+
+void StaticGrid::addSquareToGrid(GridSquare square){
+  squares_.push_back(square);
+}
+
+// TODO: Figure out how to handle a click that doesn't lie within a square
+// TODO: This whole function is bad
+GridSquare* StaticGrid::getSquareAt(int x, int y){
+  for (auto square : squares_) {
+    if (x <= square.getXExtents().second &&
+        x > square.getXExtents().first &&
+        y <= square.getYExtents().second &&
+        y > square.getYExtents().first)
+      {
+          return &square;
+      }
   }
 }
 
@@ -94,6 +107,7 @@ int main(int argc, char** argv){
   }
 
   grid.drawGrid(8, 8);
+  std::cout << "Number of squares in grid: " << grid.getNumSquares() << std::endl;
 
   while(1) {
     //TODO: I think this needs to be in a separate thread.
