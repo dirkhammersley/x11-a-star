@@ -1,7 +1,5 @@
 #include "x_window.h"
 
-void getEvents(window::XWindow window);
-
 class GridSquare{
   public:
     GridSquare(int x_loc, int y_loc, int width, int height) : x_loc_{x_loc},
@@ -46,11 +44,23 @@ class GridSquare{
 
 class StaticGrid{
   public:
-    StaticGrid(window::XWindow window);
+    StaticGrid(window::XWindow window, int cells_high, int cells_wide);
 
-    void drawGrid(int w_cells, int h_cells);
+    void drawGrid();
     
     void drawSquare(GridSquare square, bool full);
+
+    GridSquare* getStartSquare(){
+      return start_square_;
+    }
+
+    GridSquare* getTargetSquare(){
+      return target_square_;
+    }
+
+    GridSquare* getCurrentSquare(){
+      return curr_square_;
+    }
 
     // Install a square in the grid
     void addSquareToGrid(GridSquare square);
@@ -64,8 +74,16 @@ class StaticGrid{
 
   private:
     window::XWindow window_;
+    int cells_high_;
+    int cells_wide_;
     std::vector<GridSquare> squares_;
+    GridSquare* curr_square_;
+    GridSquare* start_square_;
+    GridSquare* target_square_;
 };
+
+// Right now, most of the "game logic" goes here.
+void handleEvents(window::XWindow window, GridSquare* grid);
 
 // Check equality accounting for floating point error
 template <class T>
