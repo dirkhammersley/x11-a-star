@@ -34,8 +34,7 @@ void StaticGrid::drawSquare(GridSquare square, bool full){
 }
 
 //TEST_ME
-std::vector<GridSquare *> StaticGrid::getNeighboringSquares(GridSquare* square){
-  std::vector<GridSquare *> result;
+void StaticGrid::getNeighboringSquares(GridSquare* square, std::vector<GridSquare *> &output){
   for (auto s : squares_){
     //Add a feature for "isObstacle()" or similar to note if square should not be considered
     int test_x = s.getCenter().first;
@@ -46,10 +45,11 @@ std::vector<GridSquare *> StaticGrid::getNeighboringSquares(GridSquare* square){
     //Consider neighboring squares to be squares sharing an edge.
     if(((test_x == x + square_size_ || test_x == x - square_size_) && test_y == y) ||
         ((test_y == y + square_size_ || test_y == y - square_size_) && test_x == x)){
-      result.push_back(&s);
+     std::cout << "Is nieghbor!" << std::endl;
+     output.push_back(&s);
+     std::cout << "Found " << output.size() << " neighbors!" << std::endl;
     }
   }
-  return result;
 }
 
 void StaticGrid::addSquareToGrid(GridSquare square){

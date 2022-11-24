@@ -154,6 +154,10 @@ void runAStar(StaticGrid* grid, window::XWindow window){
   while (open_set.size() > 0){
     std::cout << "Beginning A* loop!" << std::endl;
     auto current_square = getLowestScore(f_score);
+    std::vector<GridSquare*> neighbors;
+    std::cout << "Choosing square at (" << current_square->getCenter().first << 
+                  ", " << current_square->getCenter().second << ")" 
+                  << std::endl;
     current_square->draw(window, true);
     //Wait so we can see progress
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -166,14 +170,20 @@ void runAStar(StaticGrid* grid, window::XWindow window){
     open_set.erase(std::find(open_set.begin(), open_set.end(), current_square));
 
     //Explore each neighboring square
-    auto neighbors = grid->getNeighboringSquares(current_square);
+    grid->getNeighboringSquares(current_square, neighbors);
     for (auto n : neighbors){
+      std::cout << "Evaluating neighboring square at (" << n->getCenter().first << 
+                  ", " << n->getCenter().second << ")" 
+                  << std::endl;
       auto guess_g_score = distanceBetweenSquares(current_square, grid->getTargetSquare()) + (double) grid->getSquareSize();
-      if (distanceBetweenSquares(n, grid->getTargetSquare()) < guess_g_score){
+      auto curr_g_score = distanceBetweenSquares(n, grid->getTargetSquare());
+      std::cout << "Estimated G score for current square: " << curr_g_score << std::endl;
+      std::cout << "Estimated G score for this neighbor square: " << guess_g_score << std::endl;
+      if ( curr_g_score < guess_g_score){
         came_from[n] = current_square;
         g_score[n] = guess_g_score;
         f_score[n] = g_score[n] + distanceBetweenSquares(n, grid->getTargetSquare());
-        if (std::find(open_set.begin(), open_set.end(), n) != open_set.end()){
+        if (std::find(open_set.begin(), open_set.end(), n) == open_set.end()){
           open_set.push_back(n);
         }
       }

@@ -74,7 +74,7 @@ class StaticGrid{
         return square_size_;
     }
 
-    std::vector<GridSquare *> getNeighboringSquares(GridSquare* square);
+    void getNeighboringSquares(GridSquare* square, std::vector<GridSquare *> &output);
 
     // Install a square in the grid
     void addSquareToGrid(GridSquare square);
