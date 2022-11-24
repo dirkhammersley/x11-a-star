@@ -22,6 +22,10 @@ class GridSquare{
       color_ = new_color;
     }
 
+    bool isObstacle(){
+      return is_obstacle_;
+    }
+
     void draw(window::XWindow window, bool full){
       if (full == true){
         XSetForeground(window.getDisplay(), window.getGc(), window.colors.cyber_red);
@@ -39,12 +43,15 @@ class GridSquare{
     int width_;
     int height_;
     bool visited_;
+
+    //Whether or not the square can be traversed. If not, it's an obstacle.
+    bool is_obstacle_;
     uint16_t id_;
 };
 
 class StaticGrid{
   public:
-    StaticGrid(window::XWindow window, int cells_high, int cells_wide);
+    StaticGrid(window::XWindow window, int cells_high, int cells_wide, int size);
 
     void drawGrid();
     
@@ -62,6 +69,8 @@ class StaticGrid{
       return curr_square_;
     }
 
+    std::vector<GridSquare *> getNeighboringSquares(GridSquare* square);
+
     // Install a square in the grid
     void addSquareToGrid(GridSquare square);
 
@@ -76,8 +85,10 @@ class StaticGrid{
     window::XWindow window_;
     int cells_high_;
     int cells_wide_;
+    int square_size_;
     std::vector<GridSquare> squares_;
     GridSquare* curr_square_;
+    GridSquare* last_square_;
     GridSquare* start_square_;
     GridSquare* target_square_;
 };
@@ -85,12 +96,14 @@ class StaticGrid{
 // Right now, most of the "game logic" goes here.
 void handleEvents(window::XWindow window, GridSquare* grid);
 
+void runAStar(StaticGrid* grid);
+
 // Check equality accounting for floating point error
 template <class T>
 bool isClose(T a, T b, double tol);
 
 // ...
-double distanceBetweenPoints();
+double distanceBetweenSquares(GridSquare* square_one, GridSquare* square_two);
 
 uint16_t window_height_ = 900;
 uint16_t window_width_ = 600;
