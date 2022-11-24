@@ -4,7 +4,7 @@
 // Right now, most of the "game logic" goes here.
 void handleEvents(window::XWindow window, GridSquare* grid);
 
-void runAStar(StaticGrid* grid);
+void runAStar(StaticGrid* grid, window::XWindow window);
 
 // Check equality accounting for floating point error
 template <class T>

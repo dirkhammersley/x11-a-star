@@ -17,7 +17,7 @@ StaticGrid::StaticGrid(window::XWindow window, int cells_high, int cells_wide, i
   }
   start_square_ = &squares_[0];
   curr_square_ = start_square_;
-  target_square_ = &squares_[32];
+  target_square_ = &squares_[150];
 }
 
 void StaticGrid::drawGrid(){

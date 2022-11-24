@@ -135,14 +135,13 @@ GridSquare* getLowestScore(T &squares){
   return lowest.first;
 }
 
-void runAStar(StaticGrid* grid){
-
+void runAStar(StaticGrid* grid, window::XWindow window){
   //Discovered nodes
   std::vector<GridSquare*> open_set;
   open_set.push_back(grid->getCurrentSquare());
 
   //Visited nodes
-  std::vector<GridSquare*> came_from;
+  std::map<GridSquare*, GridSquare*> came_from;
 
   //The cost to get to a square
   std::map<GridSquare*, double> g_score;
@@ -153,8 +152,11 @@ void runAStar(StaticGrid* grid){
 
   //While the open set is not empty, run the algorithm
   while (open_set.size() > 0){
-    auto current_square = grid->getCurrentSquare();
-    *current_square = *getLowestScore(f_score);
+    std::cout << "Beginning A* loop!" << std::endl;
+    auto current_square = getLowestScore(f_score);
+    current_square->draw(window, true);
+    //Wait so we can see progress
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     if (current_square == grid->getTargetSquare()){
       //Return the path
@@ -162,8 +164,23 @@ void runAStar(StaticGrid* grid){
 
     //Remove current square from the open set
     open_set.erase(std::find(open_set.begin(), open_set.end(), current_square));
+
+    //Explore each neighboring square
+    auto neighbors = grid->getNeighboringSquares(current_square);
+    for (auto n : neighbors){
+      auto guess_g_score = distanceBetweenSquares(current_square, grid->getTargetSquare()) + (double) grid->getSquareSize();
+      if (distanceBetweenSquares(n, grid->getTargetSquare()) < guess_g_score){
+        came_from[n] = current_square;
+        g_score[n] = guess_g_score;
+        f_score[n] = g_score[n] + distanceBetweenSquares(n, grid->getTargetSquare());
+        if (std::find(open_set.begin(), open_set.end(), n) != open_set.end()){
+          open_set.push_back(n);
+        }
+      }
+    }
   }
-  
+  //Failure case
+  std::cout << "Failed to find path!" << std::endl;
 }
 
 int main(int argc, char** argv){
@@ -186,6 +203,8 @@ int main(int argc, char** argv){
   }
 
   grid.drawGrid();
+
+  runAStar(&grid, t_window);
 
   while(1) {
     //TODO: I think this needs to be in a separate thread.
