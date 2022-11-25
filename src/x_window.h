@@ -42,6 +42,7 @@ class XWindow {
       ulong cyber_red = 127 + (0<<8) + (255<<16);
       ulong cyber_blue = 255 + (0<<8) + (127<<16);
       ulong cyber_green = 200 + (255<<8) + (0<<16);
+      ulong cyber_white = 252 + (255<<8) + (255<<16);
     };
 
     window_colors colors;

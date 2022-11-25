@@ -17,15 +17,37 @@ StaticGrid::StaticGrid(window::XWindow window, int cells_high, int cells_wide, i
   }
   start_square_ = &squares_[0];
   curr_square_ = start_square_;
-  target_square_ = &squares_[3490];
+  target_square_ = getSquareAt(440, 220);
 }
 
 void StaticGrid::drawGrid(){
 
+  // Draw all squares in grid
   window_.redraw();
   for (auto square : squares_) {
     square.draw(window_, base_color_);
   }
+
+  // Highlight the target square
+  target_square_->draw(window_, window_.colors.cyber_white);
+
+  // Draw grid marker text
+  std::string y_height = std::to_string(cells_high_ * square_size_);
+  XDrawString(window_.getDisplay(), 
+              window_.getWindow(), 
+              window_.getGc(), 
+              20, 
+              cells_high_ * square_size_, 
+              y_height.c_str(), 
+              3);
+  std::string x_width = std::to_string(cells_wide_ * square_size_);
+  XDrawString(window_.getDisplay(), 
+              window_.getWindow(), 
+              window_.getGc(), 
+              cells_wide_ * square_size_,
+              20,  
+              x_width.c_str(), 
+              3);
 }
 
 void StaticGrid::drawSquare(GridSquare square, bool full){
@@ -40,13 +62,13 @@ void StaticGrid::getNeighboringSquares(GridSquare* square, std::vector<GridSquar
     int test_x = a->getCenter().first;
     int test_y = a->getCenter().second;
     int x = square->getCenter().first;
-    int y = square->getCenter().first;
+    int y = square->getCenter().second;
 
     //Consider neighboring squares to be squares sharing an edge.
-    if((test_x == x + square_size_ || test_x == x - square_size_) &&
-        (test_y == y + square_size_ || test_y == y - square_size_)){
-     a->draw(window_, window_.colors.cyber_green);
-     output.push_back(&(*a));
+    if((test_x <= x + square_size_ && test_x >= x - square_size_) &&
+        (test_y <= y + square_size_ && test_y >= y - square_size_)){
+      a->draw(window_, window_.colors.cyber_green);
+      output.push_back(&(*a));
     }
   }
   std::cout << "Found " << output.size() << " neighbors!" << std::endl;

@@ -8,15 +8,15 @@ class GridSquare{
                                                               width_{width},
                                                               height_{height} {}
     std::pair<int, int> getXExtents(){
-      return std::make_pair(x_loc_ - width_ / 2, x_loc_ + width_ / 2);
+      return std::make_pair(x_loc_, x_loc_ + width_);
     }
 
     std::pair<int, int> getYExtents(){
-      return std::make_pair(y_loc_ - height_ / 2, y_loc_ + height_ / 2);
+      return std::make_pair(y_loc_, y_loc_ + height_);
     }
 
     std::pair<int, int> getCenter(){
-      return std::make_pair(x_loc_, y_loc_);
+      return std::make_pair(x_loc_ + width_ / 2, y_loc_ + height_ / 2);
     }
 
     void setColor(ulong new_color){

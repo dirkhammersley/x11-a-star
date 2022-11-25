@@ -182,8 +182,17 @@ void runAStar(StaticGrid* grid, window::XWindow window){
       std::cout << "Evaluating neighboring square at (" << x << 
                   ", " << y << ")" 
                   << std::endl;
+      XSetForeground(window.getDisplay(), window.getGc(), window.colors.cyber_white);
       auto guess_g_score = distanceBetweenSquares(current_square, grid->getTargetSquare()) + (double) grid->getSquareSize();
       auto curr_g_score = distanceBetweenSquares(n, grid->getTargetSquare());
+      XDrawString(window.getDisplay(), 
+              window.getWindow(), 
+              window.getGc(), 
+              n->getCenter().first,
+              n->getCenter().second,  
+              std::to_string((int) curr_g_score).c_str(), 
+              3);
+      XFlush(window.getDisplay());
       std::cout << "Estimated G score for current square: " << curr_g_score << std::endl;
       std::cout << "Estimated G score for this neighbor square: " << guess_g_score << std::endl;
       if ( curr_g_score < guess_g_score){
@@ -200,13 +209,16 @@ void runAStar(StaticGrid* grid, window::XWindow window){
   std::cout << "Failed to find path!" << std::endl;
 }
 
+//TODO 1) Add obstacles
+//TODO 2) Get target square from a click before calling A-star, on a new click record
+//        current position of seeker as the "start" for a new plan
 int main(int argc, char** argv){
   // Init a window
   window::XWindow t_window;
   t_window.init(window_height_, window_width_);
 
   // Create a game grid
-  StaticGrid grid(t_window, 50, 70, 10);
+  StaticGrid grid(t_window, 16, 20, 40);
 
   // Wait a hot second
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
