@@ -17,16 +17,15 @@ StaticGrid::StaticGrid(window::XWindow window, int cells_high, int cells_wide, i
   }
   start_square_ = &squares_[0];
   curr_square_ = start_square_;
-  target_square_ = &squares_[150];
+  target_square_ = &squares_[3490];
 }
 
 void StaticGrid::drawGrid(){
 
   window_.redraw();
   for (auto square : squares_) {
-    square.draw(window_, false);
+    square.draw(window_, base_color_);
   }
-  XFlush(window_.getDisplay());
 }
 
 void StaticGrid::drawSquare(GridSquare square, bool full){
@@ -34,22 +33,23 @@ void StaticGrid::drawSquare(GridSquare square, bool full){
 }
 
 //TEST_ME
+//Something's still wrong here... is passing out the created s bad?
 void StaticGrid::getNeighboringSquares(GridSquare* square, std::vector<GridSquare *> &output){
-  for (auto s : squares_){
+  for (auto a = squares_.begin(); a < squares_.end(); a++){
     //Add a feature for "isObstacle()" or similar to note if square should not be considered
-    int test_x = s.getCenter().first;
-    int test_y = s.getCenter().second;
+    int test_x = a->getCenter().first;
+    int test_y = a->getCenter().second;
     int x = square->getCenter().first;
     int y = square->getCenter().first;
 
     //Consider neighboring squares to be squares sharing an edge.
-    if(((test_x == x + square_size_ || test_x == x - square_size_) && test_y == y) ||
-        ((test_y == y + square_size_ || test_y == y - square_size_) && test_x == x)){
-     std::cout << "Is nieghbor!" << std::endl;
-     output.push_back(&s);
-     std::cout << "Found " << output.size() << " neighbors!" << std::endl;
+    if((test_x == x + square_size_ || test_x == x - square_size_) &&
+        (test_y == y + square_size_ || test_y == y - square_size_)){
+     a->draw(window_, window_.colors.cyber_green);
+     output.push_back(&(*a));
     }
   }
+  std::cout << "Found " << output.size() << " neighbors!" << std::endl;
 }
 
 void StaticGrid::addSquareToGrid(GridSquare square){

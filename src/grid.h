@@ -27,14 +27,10 @@ class GridSquare{
       return is_obstacle_;
     }
 
-    void draw(window::XWindow window, bool full){
-      if (full == true){
-        XSetForeground(window.getDisplay(), window.getGc(), window.colors.cyber_red);
-        XFillRectangle(window.getDisplay(), window.getWindow(), window.getGc(), x_loc_, y_loc_, width_, height_);
-      }else{
-        XSetForeground(window.getDisplay(), window.getGc(), window.colors.cyber_blue);
-        XFillRectangle(window.getDisplay(), window.getWindow(), window.getGc(), x_loc_, y_loc_, width_, height_);
-      }
+    void draw(window::XWindow window, ulong color){
+      XSetForeground(window.getDisplay(), window.getGc(), color);
+      XFillRectangle(window.getDisplay(), window.getWindow(), window.getGc(), x_loc_, y_loc_, width_, height_);
+      XFlush(window.getDisplay());
     }
 
   private:
@@ -91,6 +87,7 @@ class StaticGrid{
     int cells_high_;
     int cells_wide_;
     int square_size_;
+    ulong base_color_ = window_.colors.cyber_blue;
     std::vector<GridSquare> squares_;
     GridSquare* curr_square_;
     GridSquare* last_square_;

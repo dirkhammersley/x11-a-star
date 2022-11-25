@@ -122,47 +122,52 @@ double distanceBetweenSquares(GridSquare* square_one, GridSquare* square_two){
 
 //TODO probably should not use a template here.
 //TEST_ME
-template <class T>
-GridSquare* getLowestScore(T &squares){
+
+GridSquare* getLowestScore(std::map<GridSquare*, double> &scores, std::vector<GridSquare*> &squares){
   double lowest_score = std::numeric_limits<double>::max();
-  std::pair<GridSquare*, double> lowest;
+  GridSquare* lowest;
   for (auto square : squares){
-    if (squares[square.first] < lowest_score){
-      lowest_score = squares[square.first];
+    if (scores[square] < lowest_score){
+      lowest_score = scores[square];
       lowest = square;
     }
   }
-  return lowest.first;
+  return lowest;
 }
 
 void runAStar(StaticGrid* grid, window::XWindow window){
   //Discovered nodes
   std::vector<GridSquare*> open_set;
-  open_set.push_back(grid->getCurrentSquare());
+  open_set.push_back(grid->getStartSquare());
 
   //Visited nodes
   std::map<GridSquare*, GridSquare*> came_from;
 
   //The cost to get to a square
   std::map<GridSquare*, double> g_score;
-  g_score[grid->getStartSquare()] = 0.0;
+  g_score[grid->getStartSquare()] = std::numeric_limits<double>::max();
 
   std::map<GridSquare*, double> f_score;
-  f_score[grid->getStartSquare()] = distanceBetweenSquares(grid->getStartSquare(), grid->getTargetSquare());
+  f_score[grid->getStartSquare()] = distanceBetweenSquares(grid->getStartSquare(), grid->getTargetSquare()) + 500; // Hack, need to fix this
+
+  bool reached_goal = false;
 
   //While the open set is not empty, run the algorithm
   while (open_set.size() > 0){
     std::cout << "Beginning A* loop!" << std::endl;
-    auto current_square = getLowestScore(f_score);
+    //Problem! Should look for the lowest score of suqares in open_set
+    auto current_square = getLowestScore(f_score, open_set);
     std::vector<GridSquare*> neighbors;
     std::cout << "Choosing square at (" << current_square->getCenter().first << 
                   ", " << current_square->getCenter().second << ")" 
                   << std::endl;
-    current_square->draw(window, true);
+    current_square->draw(window, window.colors.cyber_red);
     //Wait so we can see progress
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     if (current_square == grid->getTargetSquare()){
+      reached_goal == true;
+      std::cout << "Made it to target square!!" << std::endl;
       //Return the path
     }
 
@@ -172,8 +177,10 @@ void runAStar(StaticGrid* grid, window::XWindow window){
     //Explore each neighboring square
     grid->getNeighboringSquares(current_square, neighbors);
     for (auto n : neighbors){
-      std::cout << "Evaluating neighboring square at (" << n->getCenter().first << 
-                  ", " << n->getCenter().second << ")" 
+      int x = n->getCenter().first;
+      int y = n->getCenter().second;
+      std::cout << "Evaluating neighboring square at (" << x << 
+                  ", " << y << ")" 
                   << std::endl;
       auto guess_g_score = distanceBetweenSquares(current_square, grid->getTargetSquare()) + (double) grid->getSquareSize();
       auto curr_g_score = distanceBetweenSquares(n, grid->getTargetSquare());
@@ -199,7 +206,7 @@ int main(int argc, char** argv){
   t_window.init(window_height_, window_width_);
 
   // Create a game grid
-  StaticGrid grid(t_window, 12, 16, 40);
+  StaticGrid grid(t_window, 50, 70, 10);
 
   // Wait a hot second
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
