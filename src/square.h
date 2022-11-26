@@ -34,6 +34,11 @@ class GridSquare{
       XFlush(window.getDisplay());
     }
 
+  friend bool operator== (GridSquare &lhs, GridSquare &rhs){
+    bool is_equal = lhs.getCenter().first == rhs.getCenter().first && lhs.getCenter().second == rhs.getCenter().second;
+    return is_equal;
+  }
+
   private:
     ulong color_;
     int x_loc_;

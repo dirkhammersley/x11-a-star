@@ -165,9 +165,10 @@ void runAStar(StaticGrid* grid, window::XWindow window){
     //Wait so we can see progress
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    if (current_square == grid->getTargetSquare()){
-      reached_goal == true;
+    if (*current_square == *(grid->getTargetSquare())){
+      reached_goal = true;
       std::cout << "Made it to target square!!" << std::endl;
+      break;
       //Return the path
     }
 
@@ -185,6 +186,7 @@ void runAStar(StaticGrid* grid, window::XWindow window){
       XSetForeground(window.getDisplay(), window.getGc(), window.colors.cyber_white);
       auto guess_g_score = distanceBetweenSquares(current_square, grid->getTargetSquare()) + (double) grid->getSquareSize();
       auto curr_g_score = distanceBetweenSquares(n, grid->getTargetSquare());
+      #ifdef debug
       XDrawString(window.getDisplay(), 
               window.getWindow(), 
               window.getGc(), 
@@ -193,6 +195,7 @@ void runAStar(StaticGrid* grid, window::XWindow window){
               std::to_string((int) curr_g_score).c_str(), 
               std::to_string((int) curr_g_score).size());
       XFlush(window.getDisplay());
+      #endif
       std::cout << "Estimated G score for current square: " << curr_g_score << std::endl;
       std::cout << "Estimated G score for this neighbor square: " << guess_g_score << std::endl;
       if ( curr_g_score < guess_g_score){
@@ -206,7 +209,7 @@ void runAStar(StaticGrid* grid, window::XWindow window){
     }
   }
   //Failure case
-  std::cout << "Failed to find path!" << std::endl;
+  if (!reached_goal) {std::cout << "Failed to find path!" << std::endl;}
 }
 
 //TODO 1) Add obstacles
