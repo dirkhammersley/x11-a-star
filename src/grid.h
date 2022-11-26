@@ -15,12 +15,24 @@ class StaticGrid{
       return start_square_;
     }
 
+    void setStartSquare(GridSquare* start){
+      start_square_ = start;
+    }
+
     GridSquare* getTargetSquare(){
       return target_square_;
     }
 
+    void setTargetSquare(GridSquare* target){
+      target_square_ = target;
+    }
+
     GridSquare* getCurrentSquare(){
       return curr_square_;
+    }
+
+    void setCurrentSquare(GridSquare* curr){
+      curr_square_ = curr;
     }
 
     int getSquareSize(){

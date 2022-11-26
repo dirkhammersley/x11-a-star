@@ -8,11 +8,13 @@ StaticGrid::StaticGrid(window::XWindow window, int cells_high, int cells_wide, i
   int y_start = 50;
   int cell_height = square_size_;
   int cell_width = square_size_;
+  int obs_every = 3;
   
   for (int i = 0; i < cells_high_; i++){
     for (int j = 0; j < cells_wide_; j++){
-      //Create some obstacles approximately every 25 squares
-      if (i % 3 == 2 && j % 3 == 2){
+      //Initialize some squares as obstacles
+      //TODO: Break this out into a separate method
+      if (i % obs_every == 2 && j % obs_every == 2){
         GridSquare square(x_start + j * cell_height, y_start + i * cell_width, cell_height, cell_width, true);
         addSquareToGrid(square);
       }else{
@@ -23,7 +25,6 @@ StaticGrid::StaticGrid(window::XWindow window, int cells_high, int cells_wide, i
   }
   start_square_ = &squares_[0];
   curr_square_ = start_square_;
-  target_square_ = getSquareAt(440, 220);
 }
 
 void StaticGrid::drawGrid(){
@@ -41,6 +42,7 @@ void StaticGrid::drawGrid(){
   // Highlight the target square
   target_square_->draw(window_, window_.colors.cyber_white);
 
+  #ifdef debug
   // Draw grid marker text
   std::string y_height = std::to_string(cells_high_ * square_size_);
   XDrawString(window_.getDisplay(), 
@@ -58,6 +60,8 @@ void StaticGrid::drawGrid(){
               20,  
               x_width.c_str(), 
               3);
+  #endif
+  XFlush(window_.getDisplay());
 }
 
 void StaticGrid::drawSquare(GridSquare square, bool full){

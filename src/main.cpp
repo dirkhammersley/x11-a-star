@@ -89,15 +89,17 @@ void handleEvents(window::XWindow window, StaticGrid* grid){
       std::cout << "Target square X: " << target_location.first << std::endl;
       std::cout << "Target square Y: " << target_location.second << std::endl;
     }
-    
-
-    //std::cout << "Keypress: " << text[0] << "\n";
   }
 
   if (event.type == ButtonPress) {
-    window.redraw();
-    XDrawLine(window.getDisplay(), window.getWindow(), window.getGc(), 0, 0, event.xbutton.x, event.xbutton.y);
-    XFlush(window.getDisplay());
+    bool is_obs = grid->getSquareAt(event.xbutton.x, event.xbutton.y)->isObstacle();
+    if (!is_obs){
+      window.redraw();
+      grid->setTargetSquare(grid->getSquareAt(event.xbutton.x, event.xbutton.y));
+      grid->setStartSquare(grid->getCurrentSquare());
+      grid->drawGrid();
+      runAStar(grid, window);
+    }
     std::cout << "Click at: " << event.xbutton.x << ", " << event.xbutton.y << "\n";
   }
 }
@@ -120,9 +122,8 @@ double distanceBetweenSquares(GridSquare* square_one, GridSquare* square_two){
 }
 
 
-//TODO probably should not use a template here.
-//TEST_ME
 
+//TEST_ME
 GridSquare* getLowestScore(std::map<GridSquare*, double> &scores, std::vector<GridSquare*> &squares){
   double lowest_score = std::numeric_limits<double>::max();
   GridSquare* lowest;
@@ -148,22 +149,22 @@ void runAStar(StaticGrid* grid, window::XWindow window){
   g_score[grid->getStartSquare()] = std::numeric_limits<double>::max();
 
   std::map<GridSquare*, double> f_score;
-  f_score[grid->getStartSquare()] = distanceBetweenSquares(grid->getStartSquare(), grid->getTargetSquare()) + 500; // Hack, need to fix this
+  f_score[grid->getStartSquare()] = distanceBetweenSquares(grid->getStartSquare(), grid->getTargetSquare());
 
   bool reached_goal = false;
 
   //While the open set is not empty, run the algorithm
   while (open_set.size() > 0){
     std::cout << "Beginning A* loop!" << std::endl;
-    //Problem! Should look for the lowest score of suqares in open_set
     auto current_square = getLowestScore(f_score, open_set);
+    grid->setCurrentSquare(current_square);
     std::vector<GridSquare*> neighbors;
     std::cout << "Choosing square at (" << current_square->getCenter().first << 
                   ", " << current_square->getCenter().second << ")" 
                   << std::endl;
     current_square->draw(window, window.colors.cyber_red);
     //Wait so we can see progress
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     if (*current_square == *(grid->getTargetSquare())){
       reached_goal = true;
@@ -221,10 +222,7 @@ int main(int argc, char** argv){
   t_window.init(window_height_, window_width_);
 
   // Create a game grid
-  StaticGrid grid(t_window, 16, 20, 40);
-
-  // Wait a hot second
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  StaticGrid grid(t_window, 100, 120, 10);
 
   // Wait for a MapNotify event before doing anything else
   for(;;) {
@@ -235,8 +233,6 @@ int main(int argc, char** argv){
   }
 
   grid.drawGrid();
-
-  runAStar(&grid, t_window);
 
   while(1) {
     //TODO: I think this needs to be in a separate thread.
