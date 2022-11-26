@@ -16,10 +16,6 @@ void handleEvents(window::XWindow window, StaticGrid* grid){
 	char text[255]; // Buffer for key press events
   
   XNextEvent(window.getDisplay(), &event);
-	
-  /*if (event.type == Expose && event.xexpose.count == 0) {
-    window.redraw();
-  }*/
 
   // I guess this is how we get keypresses?
   if (event.type == KeyPress && XLookupString(&event.xkey, text, 255, &key, 0) == 1) {
@@ -118,10 +114,10 @@ double distanceBetweenSquares(GridSquare* square_one, GridSquare* square_two){
   int y1 = square_one->getCenter().second;
   int y2 = square_two->getCenter().second;
 
-  return (double) pow(pow((x2 - x1), 2) + pow((y2 - y1), 2), 0.5);
+  //Try out different heuristic functions!
+  //return (double) pow(pow((x2 - x1), 2) + pow((y2 - y1), 2), 0.5);
+  return (7 * (abs(x2 - x1) + abs(y2 - y1)));
 }
-
-
 
 //TEST_ME
 GridSquare* getLowestScore(std::map<GridSquare*, double> &scores, std::vector<GridSquare*> &squares){
@@ -148,6 +144,7 @@ void runAStar(StaticGrid* grid, window::XWindow window){
   std::map<GridSquare*, double> g_score;
   g_score[grid->getStartSquare()] = std::numeric_limits<double>::max();
 
+  //The estimated cost from a given square to the target
   std::map<GridSquare*, double> f_score;
   f_score[grid->getStartSquare()] = distanceBetweenSquares(grid->getStartSquare(), grid->getTargetSquare());
 
@@ -155,39 +152,35 @@ void runAStar(StaticGrid* grid, window::XWindow window){
 
   //While the open set is not empty, run the algorithm
   while (open_set.size() > 0){
-    std::cout << "Beginning A* loop!" << std::endl;
+
+    //Choose the next square, update the grid, and color the square.
     auto current_square = getLowestScore(f_score, open_set);
     grid->setCurrentSquare(current_square);
-    std::vector<GridSquare*> neighbors;
-    std::cout << "Choosing square at (" << current_square->getCenter().first << 
-                  ", " << current_square->getCenter().second << ")" 
-                  << std::endl;
     current_square->draw(window, window.colors.cyber_red);
-    //Wait so we can see progress
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
+    //TODO Return the path
     if (*current_square == *(grid->getTargetSquare())){
       reached_goal = true;
       std::cout << "Made it to target square!!" << std::endl;
       break;
-      //Return the path
     }
 
     //Remove current square from the open set
     open_set.erase(std::find(open_set.begin(), open_set.end(), current_square));
 
+    //Wait so we can see progress
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+    std::vector<GridSquare*> neighbors;
+
     //Explore each neighboring square
     grid->getNeighboringSquares(current_square, neighbors);
     for (auto n : neighbors){
-      int x = n->getCenter().first;
-      int y = n->getCenter().second;
-      std::cout << "Evaluating neighboring square at (" << x << 
-                  ", " << y << ")" 
-                  << std::endl;
-      XSetForeground(window.getDisplay(), window.getGc(), window.colors.cyber_white);
+
       auto guess_g_score = distanceBetweenSquares(current_square, grid->getTargetSquare()) + (double) grid->getSquareSize();
       auto curr_g_score = distanceBetweenSquares(n, grid->getTargetSquare());
       #ifdef debug
+      XSetForeground(window.getDisplay(), window.getGc(), window.colors.cyber_white);
       XDrawString(window.getDisplay(), 
               window.getWindow(), 
               window.getGc(), 
@@ -197,8 +190,7 @@ void runAStar(StaticGrid* grid, window::XWindow window){
               std::to_string((int) curr_g_score).size());
       XFlush(window.getDisplay());
       #endif
-      std::cout << "Estimated G score for current square: " << curr_g_score << std::endl;
-      std::cout << "Estimated G score for this neighbor square: " << guess_g_score << std::endl;
+
       if ( curr_g_score < guess_g_score){
         came_from[n] = current_square;
         g_score[n] = guess_g_score;
@@ -213,9 +205,6 @@ void runAStar(StaticGrid* grid, window::XWindow window){
   if (!reached_goal) {std::cout << "Failed to find path!" << std::endl;}
 }
 
-//TODO 1) Add obstacles
-//TODO 2) Get target square from a click before calling A-star, on a new click record
-//        current position of seeker as the "start" for a new plan
 int main(int argc, char** argv){
   // Init a window
   window::XWindow t_window;
