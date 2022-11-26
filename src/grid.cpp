@@ -11,8 +11,14 @@ StaticGrid::StaticGrid(window::XWindow window, int cells_high, int cells_wide, i
   
   for (int i = 0; i < cells_high_; i++){
     for (int j = 0; j < cells_wide_; j++){
-      GridSquare square(x_start + j * cell_height, y_start + i * cell_width, cell_height, cell_width);
-      addSquareToGrid(square);
+      //Create some obstacles approximately every 25 squares
+      if (i % 3 == 2 && j % 3 == 2){
+        GridSquare square(x_start + j * cell_height, y_start + i * cell_width, cell_height, cell_width, true);
+        addSquareToGrid(square);
+      }else{
+        GridSquare square(x_start + j * cell_height, y_start + i * cell_width, cell_height, cell_width, false);
+        addSquareToGrid(square);
+      }
     }
   }
   start_square_ = &squares_[0];
@@ -25,7 +31,11 @@ void StaticGrid::drawGrid(){
   // Draw all squares in grid
   window_.redraw();
   for (auto square : squares_) {
-    square.draw(window_, base_color_);
+    if (!square.isObstacle()){
+      square.draw(window_, base_color_);
+    }else{
+      square.draw(window_, 0);
+    }
   }
 
   // Highlight the target square
@@ -66,7 +76,8 @@ void StaticGrid::getNeighboringSquares(GridSquare* square, std::vector<GridSquar
 
     //Consider neighboring squares to be squares sharing an edge.
     if((test_x <= x + square_size_ && test_x >= x - square_size_) &&
-        (test_y <= y + square_size_ && test_y >= y - square_size_)){
+        (test_y <= y + square_size_ && test_y >= y - square_size_) &&
+          !a->isObstacle()){
       a->draw(window_, window_.colors.cyber_green);
       output.push_back(&(*a));
     }

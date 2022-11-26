@@ -191,7 +191,7 @@ void runAStar(StaticGrid* grid, window::XWindow window){
               n->getCenter().first,
               n->getCenter().second,  
               std::to_string((int) curr_g_score).c_str(), 
-              3);
+              std::to_string((int) curr_g_score).size());
       XFlush(window.getDisplay());
       std::cout << "Estimated G score for current square: " << curr_g_score << std::endl;
       std::cout << "Estimated G score for this neighbor square: " << guess_g_score << std::endl;

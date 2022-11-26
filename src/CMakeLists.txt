@@ -3,6 +3,7 @@ project(AStar)
 
 add_library(Window x_window.cpp x_window.h)
 add_library(Grid grid.cpp grid.h)
+add_library(Square square.cpp square.h)
 add_executable(AStarApp main.cpp main.h)
 
 
